@@ -1,0 +1,96 @@
+name: publish
+
+# Publishes the growth-ops queue from a secure CI vault.
+#
+# Why CI: credentials live as GitHub Actions secrets (encrypted, write-only from the
+# CLI, never readable back). The owner adds each one once with `gh secret set NAME`;
+# no secret ever appears in a chat, in this repo, or in a local file.
+#
+# Safety: dry_run defaults to TRUE. A real post requires manually dispatching this
+# workflow with dry_run=false, so nothing can go public on a timer by accident.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true = validate only, false = actually publish"
+        required: true
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+      channel:
+        description: "Limit to one channel (blank = all connected)"
+        required: false
+        default: ""
+        type: string
+  schedule:
+    # daily 05:10 UTC validation pass — never publishes, only reports readiness
+    - cron: "10 5 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: parbarshop/contract-check
+          path: tools
+
+      - name: Checkout private growth-ops workspace
+        uses: actions/checkout@v4
+        with:
+          repository: parbarshop/growth-ops
+          path: ops
+          token: ${{ secrets.OPS_REPO_TOKEN || github.token }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Report credential readiness (no values)
+        env:
+          BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+          PINTEREST_TOKEN: ${{ secrets.PINTEREST_TOKEN }}
+          PINTEREST_BOARD_ID: ${{ secrets.PINTEREST_BOARD_ID }}
+          MASTODON_INSTANCE: ${{ secrets.MASTODON_INSTANCE }}
+          MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          echo "Configured channels (set = has credential):"
+          for v in BSKY_HANDLE BSKY_APP_PASSWORD PINTEREST_TOKEN PINTEREST_BOARD_ID \
+                   MASTODON_INSTANCE MASTODON_TOKEN TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID; do
+            if [ -n "${!v}" ]; then echo "  $v = SET"; else echo "  $v = missing"; fi
+          done
+
+      - name: Validate queue (never posts)
+        working-directory: ops
+        run: python scripts/publish.py run
+
+      - name: Publish
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run == 'false'
+        working-directory: ops
+        env:
+          BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+          PINTEREST_TOKEN: ${{ secrets.PINTEREST_TOKEN }}
+          PINTEREST_BOARD_ID: ${{ secrets.PINTEREST_BOARD_ID }}
+          MASTODON_INSTANCE: ${{ secrets.MASTODON_INSTANCE }}
+          MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/publish.py run --publish
+
+      - name: Cloudflare daily numbers (read-only) if configured
+        if: env.CF_API_TOKEN != ''
+        working-directory: ops
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: python scripts/cloudflare_report.py daily 1
