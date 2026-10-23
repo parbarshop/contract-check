@@ -1,0 +1,80 @@
+{
+ "run": "20261023T083515Z",
+ "results": [
+  {
+   "site": "orbisica",
+   "checked_at": "2026-10-23T08:35:15Z",
+   "sitemap_status": 200,
+   "sitemap_bytes": 264173,
+   "sitemap_sha256_12": "db2d685c2274",
+   "child_sitemaps": 0,
+   "url_count": 724,
+   "sample_urls": [
+    "https://orbisica.com/",
+    "https://orbisica.com/categories/science-space",
+    "https://orbisica.com/categories/geography"
+   ],
+   "ok": true
+  },
+  {
+   "site": "kitchenmind",
+   "checked_at": "2026-10-23T08:35:16Z",
+   "sitemap_status": 200,
+   "sitemap_bytes": 1502,
+   "sitemap_sha256_12": "ca358e11307c",
+   "child_sitemaps": 12,
+   "url_count": 0,
+   "sample_urls": [
+    "https://kitchenmindai.com/ar/sitemap.xml",
+    "https://kitchenmindai.com/de/sitemap.xml",
+    "https://kitchenmindai.com/en/sitemap.xml"
+   ],
+   "ok": true
+  },
+  {
+   "site": "utiqo",
+   "checked_at": "2026-10-23T08:35:16Z",
+   "sitemap_status": 200,
+   "sitemap_bytes": 22183,
+   "sitemap_sha256_12": "74dd75349b21",
+   "child_sitemaps": 0,
+   "url_count": 76,
+   "sample_urls": [
+    "https://utiqo.com/en",
+    "https://utiqo.com/en/about",
+    "https://utiqo.com/en/privacy"
+   ],
+   "ok": true
+  },
+  {
+   "site": "tintiva",
+   "checked_at": "2026-10-23T08:35:17Z",
+   "sitemap_status": 200,
+   "sitemap_bytes": 650807,
+   "sitemap_sha256_12": "32e37319844a",
+   "child_sitemaps": 0,
+   "url_count": 1048,
+   "sample_urls": [
+    "https://tintiva.com",
+    "https://tintiva.com/ar",
+    "https://tintiva.com/es"
+   ],
+   "ok": true
+  },
+  {
+   "site": "emojiselect",
+   "checked_at": "2026-10-23T08:35:18Z",
+   "sitemap_status": 200,
+   "sitemap_bytes": 1164,
+   "sitemap_sha256_12": "902ed35124c9",
+   "child_sitemaps": 9,
+   "url_count": 0,
+   "sample_urls": [
+    "https://emojiselect.com/sitemaps/en.xml",
+    "https://emojiselect.com/sitemaps/ar.xml",
+    "https://emojiselect.com/sitemaps/es.xml"
+   ],
+   "ok": true
+  }
+ ]
+}
